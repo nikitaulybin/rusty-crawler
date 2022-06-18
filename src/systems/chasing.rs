@@ -7,7 +7,6 @@ use crate::prelude::*;
 #[read_component(FieldOfView)]
 pub fn chasing(ecs: &SubWorld, commands: &mut CommandBuffer, #[resource] map: &Map) {
     let mut movers = <(Entity, &Point, &ChasingPlayer, &FieldOfView)>::query();
-    // let mut chased = <(Entity, &Point, &Health)>::query();
     let mut players = <(Entity, &Point, &Player)>::query();
 
     let player_entity: &Entity = players.iter(ecs).next().unwrap().0;
