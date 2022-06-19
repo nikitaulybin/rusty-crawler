@@ -24,6 +24,23 @@ pub fn player_input(
         players.iter(ecs).for_each(|(player_entity, pos)| {
             let destination = *pos + delta;
             let mut attack_initiated = false;
+            let nearby_tiles = vec![
+                *pos + Point::new(1, 0),
+                *pos + Point::new(1, 1),
+                *pos + Point::new(0, 1),
+                *pos + Point::new(0, -1),
+                *pos + Point::new(-1, 0),
+                *pos + Point::new(-1, -1),
+                *pos + Point::new(-1, 1),
+                *pos + Point::new(1, -1),
+            ];
+
+            let enemies_nearby = enemies
+                .iter(ecs)
+                .filter(|(_, enemy_pos)| nearby_tiles.contains(enemy_pos))
+                .count()
+                > 0;
+
             enemies
                 .iter(ecs)
                 .filter(|(_, pos)| **pos == destination)
@@ -41,7 +58,7 @@ pub fn player_input(
                 },));
             }
 
-            if !attack_initiated && !moved {
+            if !attack_initiated && !moved && !enemies_nearby {
                 if let Ok(mut health) = ecs
                     .clone()
                     .entry_mut(*player_entity)
