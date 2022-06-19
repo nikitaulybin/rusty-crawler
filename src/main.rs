@@ -12,8 +12,8 @@ mod prelude {
     pub use legion::*;
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
-    pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 3;
-    pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 3;
+    pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH;
+    pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT;
     pub const MAP_CONSOLE: usize = 0;
     pub const PLAYER_CONSOLE: usize = 1;
     pub const HUD_CONSOLE: usize = 2;
@@ -49,12 +49,6 @@ impl State {
             .monster_spawns
             .iter()
             .for_each(|pos| spawn_monster(&mut ecs, &mut rng, *pos));
-        // map_builder
-        //     .rooms
-        //     .iter()
-        //     .skip(1)
-        //     .map(|r| r.center())
-        //     .for_each(|pos| spawn_monster(&mut ecs, &mut rng, pos));
 
         resources.insert(map_builder.map);
         resources.insert(Camera::new(player_start));
