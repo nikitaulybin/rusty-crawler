@@ -1,7 +1,10 @@
 use crate::prelude::*;
 use automata::AutomataArchitect;
+use drunkards_walk::DrunkardsWalkArchitect;
+use rooms::RoomsArchitect;
 
 mod automata;
+mod drunkards_walk;
 mod rooms;
 
 const NUM_ROOMS: usize = 20;
@@ -22,7 +25,11 @@ trait MapArchitect {
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut architect = AutomataArchitect {};
+        let mut architect: Box<dyn MapArchitect> = match rng.range(0, 3) {
+            0 => Box::new(DrunkardsWalkArchitect {}),
+            1 => Box::new(RoomsArchitect {}),
+            _ => Box::new(AutomataArchitect {}),
+        };
         architect.build(rng)
     }
 
