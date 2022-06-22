@@ -35,6 +35,8 @@ impl MapBuilder {
         };
         let mut mb = architect.build(rng);
         apply_prefab(&mut mb, rng);
+        apply_prefab(&mut mb, rng);
+        apply_prefab(&mut mb, rng);
 
         mb
     }

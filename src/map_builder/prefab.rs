@@ -2,30 +2,6 @@ use crate::prelude::*;
 
 const UNREACHABLE: f32 = f32::MAX;
 
-const FORTRESS: (&str, i32, i32) = (
-    "
-------------
----######---
----#----#---
----#----#---
----#----#---
--###----###-
--#--------#-
--#--------#-
--M--------M-
--#--------#-
--#--------#-
--###----###-
----#----#---
----#----#---
----#----#---
----######---
-------------
-",
-    12,
-    16,
-);
-
 pub fn apply_prefab(mb: &mut MapBuilder, rng: &mut RandomNumberGenerator) {
     let dijkstra_map = DijkstraMap::new(
         SCREEN_WIDTH,
@@ -35,14 +11,19 @@ pub fn apply_prefab(mb: &mut MapBuilder, rng: &mut RandomNumberGenerator) {
         1024.0,
     );
 
+    let prefab: Prefab = match rng.range::<i8>(0, 2) {
+        0 => FORTRESS,
+        1 => CHESS,
+        _ => FORTRESS,
+    };
     let mut placement: Option<Point> = None;
     let mut attempts = 0;
     while placement.is_none() && attempts < 10 {
         let dimensions = Rect::with_size(
-            rng.range(0, SCREEN_WIDTH - FORTRESS.1),
-            rng.range(0, SCREEN_HEIGHT - FORTRESS.2),
-            FORTRESS.1,
-            FORTRESS.2,
+            rng.range(0, SCREEN_WIDTH - prefab.width),
+            rng.range(0, SCREEN_HEIGHT - prefab.height),
+            prefab.width,
+            prefab.height,
         );
 
         let mut can_place = false;
@@ -63,17 +44,16 @@ pub fn apply_prefab(mb: &mut MapBuilder, rng: &mut RandomNumberGenerator) {
     }
 
     if let Some(placement) = placement {
-        let fortress_chars: Vec<char> = FORTRESS
-            .0
+        let prefab_chars: Vec<char> = prefab
+            .structure_str
             .chars()
-            .filter(|c| *c != '\n' && *c != '\r')
+            .filter(|c| *c != '\n' && *c != '\r' && *c != ' ')
             .collect();
-
         let mut current_char_idx = 0;
-        for py in placement.y..placement.y + FORTRESS.2 {
-            for px in placement.x..placement.x + FORTRESS.1 {
+        for py in placement.y..placement.y + prefab.height {
+            for px in placement.x..placement.x + prefab.width {
                 let map_idx = map_idx(px, py);
-                let c = fortress_chars[current_char_idx];
+                let c = prefab_chars[current_char_idx];
                 match c {
                     '-' => mb.map.tiles[map_idx] = TileType::Floor,
                     '#' => mb.map.tiles[map_idx] = TileType::Wall,

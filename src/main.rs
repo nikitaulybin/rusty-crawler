@@ -1,5 +1,6 @@
 mod camera;
 mod components;
+pub mod lib;
 mod map;
 mod map_builder;
 mod spawner;
@@ -19,6 +20,7 @@ mod prelude {
     pub const HUD_CONSOLE: usize = 2;
     pub use crate::camera::*;
     pub use crate::components::*;
+    pub use crate::lib::fixtures::map_prefabs::*;
     pub use crate::map::*;
     pub use crate::map_builder::*;
     pub use crate::spawner::*;
