@@ -13,8 +13,7 @@ pub fn apply_prefab(mb: &mut MapBuilder, rng: &mut RandomNumberGenerator) {
 
     let prefab: Prefab = match rng.range::<i8>(0, 2) {
         0 => FORTRESS,
-        1 => CHESS,
-        _ => FORTRESS,
+        _ => CHESS,
     };
     let mut placement: Option<Point> = None;
     let mut attempts = 0;
@@ -38,7 +37,6 @@ pub fn apply_prefab(mb: &mut MapBuilder, rng: &mut RandomNumberGenerator) {
         attempts += 1;
 
         if can_place {
-            println!("Found placement");
             placement = Some(Point::new(dimensions.x1, dimensions.y1));
         }
     }

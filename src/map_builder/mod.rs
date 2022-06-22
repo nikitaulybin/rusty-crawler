@@ -1,14 +1,16 @@
-use crate::prelude::*;
-use automata::AutomataArchitect;
-use drunkards_walk::DrunkardsWalkArchitect;
-use rooms::RoomsArchitect;
-
-use self::prefab::apply_prefab;
-
 mod automata;
 mod drunkards_walk;
 mod prefab;
 mod rooms;
+mod themes;
+
+use crate::prelude::*;
+use automata::AutomataArchitect;
+use drunkards_walk::DrunkardsWalkArchitect;
+use rooms::RoomsArchitect;
+use themes::*;
+
+use self::prefab::apply_prefab;
 
 const NUM_ROOMS: usize = 20;
 const NUM_MONSTERS: usize = 50;
@@ -20,6 +22,11 @@ pub struct MapBuilder {
     pub monster_spawns: Vec<Point>,
     pub player_start: Point,
     pub amulet_start: Point,
+    pub theme: Box<dyn MapTheme>,
+}
+
+pub trait MapTheme: Sync + Send {
+    fn tile_to_render(&self, tile_type: TileType) -> FontCharType;
 }
 
 trait MapArchitect {
@@ -37,6 +44,11 @@ impl MapBuilder {
         apply_prefab(&mut mb, rng);
         apply_prefab(&mut mb, rng);
         apply_prefab(&mut mb, rng);
+
+        mb.theme = match rng.range(0, 2) {
+            0 => DungeonTheme::build(),
+            _ => ForestTheme::build(),
+        };
 
         mb
     }
