@@ -8,7 +8,7 @@ impl MapArchitect for RoomsArchitect {
         let mut mb = MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),
-            monster_spawns: Vec::new(),
+            entity_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
             theme: super::themes::DungeonTheme::build(),
@@ -21,7 +21,7 @@ impl MapArchitect for RoomsArchitect {
         mb.amulet_start = mb.find_most_distant(&mb.player_start);
 
         for room in mb.rooms.iter().skip(1) {
-            mb.monster_spawns.push(room.center());
+            mb.entity_spawns.push(room.center());
         }
         mb
     }

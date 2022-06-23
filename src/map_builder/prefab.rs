@@ -57,7 +57,7 @@ pub fn apply_prefab(mb: &mut MapBuilder, rng: &mut RandomNumberGenerator) {
                     '#' => mb.map.tiles[map_idx] = TileType::Wall,
                     'M' => {
                         mb.map.tiles[map_idx] = TileType::Floor;
-                        mb.monster_spawns.push(Point::new(px, py));
+                        mb.entity_spawns.push(Point::new(px, py));
                     }
                     _ => {
                         println!("Unhandled char: {}", c);

@@ -59,3 +59,38 @@ fn goblin() -> (i32, String, FontCharType) {
 fn orc() -> (i32, String, FontCharType) {
     (2, "Orc".to_string(), to_cp437('o'))
 }
+
+pub fn spawn_healing_potion(ecs: &mut World, pos: Point) {
+    ecs.push((
+        Item,
+        Name("Healing Potion".to_string()),
+        ProvidesHealing { amount: 3 },
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('!'),
+        },
+        pos,
+    ));
+}
+
+pub fn spawn_map(ecs: &mut World, pos: Point) {
+    ecs.push((
+        Item,
+        Name("Map".to_string()),
+        RevealsMap,
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('{'),
+        },
+        pos,
+    ));
+}
+
+pub fn spawn_entity(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Point) {
+    let roll = rng.roll_dice(1, 6);
+    match roll {
+        1 => spawn_healing_potion(ecs, pos),
+        2 => spawn_map(ecs, pos),
+        _ => spawn_monster(ecs, rng, pos),
+    }
+}

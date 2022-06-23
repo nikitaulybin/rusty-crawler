@@ -8,13 +8,14 @@ mod systems;
 mod turn_state;
 mod prelude {
     pub use bracket_lib::prelude::*;
+    pub use indexmap::IndexMap;
     pub use legion::systems::CommandBuffer;
     pub use legion::world::SubWorld;
     pub use legion::*;
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
-    pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH;
-    pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT;
+    pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 3;
+    pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 3;
     pub const MAP_CONSOLE: usize = 0;
     pub const PLAYER_CONSOLE: usize = 1;
     pub const HUD_CONSOLE: usize = 2;
@@ -48,9 +49,9 @@ impl State {
         spawn_player(&mut ecs, player_start);
         spawn_amulet_of_yala(&mut ecs, map_builder.amulet_start);
         map_builder
-            .monster_spawns
+            .entity_spawns
             .iter()
-            .for_each(|pos| spawn_monster(&mut ecs, &mut rng, *pos));
+            .for_each(|pos| spawn_entity(&mut ecs, &mut rng, *pos));
 
         resources.insert(map_builder.map);
         resources.insert(Camera::new(player_start));
@@ -75,9 +76,9 @@ impl State {
         spawn_player(&mut self.ecs, player_start);
         spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
         map_builder
-            .monster_spawns
+            .entity_spawns
             .iter()
-            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, *pos));
+            .for_each(|pos| spawn_entity(&mut self.ecs, &mut rng, *pos));
 
         self.resources.insert(map_builder.map);
         self.resources.insert(Camera::new(player_start));
