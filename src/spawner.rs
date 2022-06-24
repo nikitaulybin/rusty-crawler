@@ -64,7 +64,7 @@ pub fn spawn_healing_potion(ecs: &mut World, pos: Point) {
     ecs.push((
         Item,
         Name("Healing Potion".to_string()),
-        ProvidesHealing { amount: 3 },
+        ProvidesHealing { amount: 2 },
         Render {
             color: ColorPair::new(WHITE, BLACK),
             glyph: to_cp437('!'),

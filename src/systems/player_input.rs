@@ -7,6 +7,7 @@ use std::borrow::Borrow;
 #[write_component(Health)]
 #[read_component(Item)]
 #[read_component(Carried)]
+#[read_component(Name)]
 #[read_component(ProvidesHealing)]
 #[read_component(RevealsMap)]
 pub fn player_input(
@@ -50,26 +51,9 @@ pub fn player_input(
             VirtualKeyCode::Key9 => use_item(8, ecs, commands),
             _ => Point::zero(),
         };
-        let moved = delta.x != 0 || delta.y != 0;
         players.iter(ecs).for_each(|(player_entity, pos)| {
             let destination = *pos + delta;
             let mut attack_initiated = false;
-            let nearby_tiles = vec![
-                *pos + Point::new(1, 0),
-                *pos + Point::new(1, 1),
-                *pos + Point::new(0, 1),
-                *pos + Point::new(0, -1),
-                *pos + Point::new(-1, 0),
-                *pos + Point::new(-1, -1),
-                *pos + Point::new(-1, 1),
-                *pos + Point::new(1, -1),
-            ];
-
-            let enemies_nearby = enemies
-                .iter(ecs)
-                .filter(|(_, enemy_pos)| nearby_tiles.contains(enemy_pos))
-                .count()
-                > 0;
 
             enemies
                 .iter(ecs)
@@ -87,17 +71,6 @@ pub fn player_input(
                     destination,
                 },));
             }
-
-            if !attack_initiated && !moved && !enemies_nearby {
-                if let Ok(mut health) = ecs
-                    .clone()
-                    .entry_mut(*player_entity)
-                    .unwrap()
-                    .get_component_mut::<Health>()
-                {
-                    health.current = i32::min(health.max, health.current + 1);
-                }
-            }
         });
 
         *turn_state = TurnState::PlayerTurn;
@@ -111,29 +84,23 @@ fn use_item(index: usize, ecs: &mut SubWorld, commands: &mut CommandBuffer) -> P
         .next()
         .unwrap();
 
-    let mut item_map: IndexMap<&str, i32> = IndexMap::new();
-    <(&Item, &Name, &Carried)>::query()
+    let mut item_map: IndexMap<&str, Vec<Entity>> = IndexMap::new();
+    <(Entity, &Name, &Item, &Carried)>::query()
         .iter(ecs)
-        .filter(|(_, _, carried)| carried.0 == *player_entity)
-        .for_each(|(_, name, _)| {
-            if let Some(item_count) = item_map.remove(&name.0.borrow()) {
-                item_map.insert(name.0.borrow(), item_count + 1);
+        .filter(|(_, _, _, carried)| carried.0 == *player_entity)
+        .for_each(|(item_entity, name, _, _)| {
+            if let Some(items_added) = item_map.remove(&name.0.borrow()) {
+                let mut new_items = items_added;
+                new_items.push(*item_entity);
+                item_map.insert(name.0.borrow(), new_items);
             } else {
-                item_map.insert(name.0.borrow(), 1);
+                item_map.insert(name.0.borrow(), vec![*item_entity]);
             }
         });
 
-    if let Some(item) = item_map.get_index(index) {
-        let is_potion = ecs
-            .entry_ref(*item)
-            .unwrap()
-            .get_component::<ProvidesHealing>()
-            .is_ok();
-        if is_potion {
-            println!("About to use healing potion")
-        } else {
-            println!("Using map")
-        }
+    if let Some((_name, items)) = item_map.get_index(index) {
+        let mut items_copy = items.clone();
+        let item = items_copy.pop().unwrap();
         commands.push((ActivateItem {
             item,
             applied_by: *player_entity,

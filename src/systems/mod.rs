@@ -10,6 +10,7 @@ mod movement;
 mod player_input;
 mod random_move;
 mod tooltips;
+mod use_items;
 
 pub fn build_input_scheduler() -> Schedule {
     Schedule::builder()
@@ -26,6 +27,8 @@ pub fn build_input_scheduler() -> Schedule {
 pub fn build_player_scheduler() -> Schedule {
     Schedule::builder()
         .add_system(movement::movement_system())
+        .flush()
+        .add_system(use_items::use_items_system())
         .flush()
         .add_system(combat::combat_system())
         .flush()
