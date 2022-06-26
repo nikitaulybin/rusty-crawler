@@ -9,8 +9,11 @@ use crate::prelude::*;
 #[read_component(Carried)]
 #[read_component(Name)]
 pub fn hud(ecs: &SubWorld) {
-    let mut player_query = <(Entity, &Health)>::query().filter(component::<Player>());
-    let (player_entity, player_health) = player_query.iter(ecs).next().unwrap();
+    let mut player_query = <(Entity, &Health, &Player)>::query();
+    let (player_entity, player_health, player_level) = player_query
+        .iter(ecs)
+        .find_map(|(entity, health, player)| Some((entity, health, player.map_level)))
+        .unwrap();
 
     let mut draw_batch = DrawBatch::new();
     draw_batch.target(HUD_CONSOLE);
@@ -53,6 +56,12 @@ pub fn hud(ecs: &SubWorld) {
             ColorPair::new(YELLOW, BLACK),
         );
     }
+
+    draw_batch.print_color_right(
+        Point::new(SCREEN_WIDTH * 2, 1),
+        format!("Dungeon Level: {}", player_level + 1),
+        ColorPair::new(YELLOW, BLACK),
+    );
     draw_batch
         .submit((SCREEN_WIDTH * SCREEN_HEIGHT + 2000) as usize)
         .expect("Batch Error");

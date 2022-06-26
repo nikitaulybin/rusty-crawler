@@ -34,20 +34,29 @@ trait MapArchitect {
 }
 
 impl MapBuilder {
-    pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut architect: Box<dyn MapArchitect> = match rng.range(0, 3) {
-            0 => Box::new(DrunkardsWalkArchitect {}),
-            1 => Box::new(RoomsArchitect {}),
-            _ => Box::new(AutomataArchitect {}),
+    pub fn new(rng: &mut RandomNumberGenerator, map_level: u32) -> Self {
+        let mut architect: Box<dyn MapArchitect> = match map_level {
+            0 => match rng.range::<i8>(0, 2) {
+                0 => Box::new(DrunkardsWalkArchitect {}),
+                _ => Box::new(AutomataArchitect {}),
+            },
+            _ => match rng.range::<i8>(0, 3) {
+                0 => Box::new(DrunkardsWalkArchitect {}),
+                1 => Box::new(RoomsArchitect {}),
+                _ => Box::new(AutomataArchitect {}),
+            },
         };
         let mut mb = architect.build(rng);
         apply_prefab(&mut mb, rng);
         apply_prefab(&mut mb, rng);
         apply_prefab(&mut mb, rng);
 
-        mb.theme = match rng.range(0, 2) {
-            0 => DungeonTheme::build(),
-            _ => ForestTheme::build(),
+        let amulet_start_idx = map_idx(mb.amulet_start.x, mb.amulet_start.y);
+        mb.map.tiles[amulet_start_idx] = TileType::Exit;
+
+        mb.theme = match map_level {
+            0 => ForestTheme::build(),
+            _ => DungeonTheme::build(),
         };
 
         mb

@@ -14,6 +14,7 @@ pub fn player_input(
     ecs: &mut SubWorld,
     #[resource] key: &Option<VirtualKeyCode>,
     #[resource] turn_state: &mut TurnState,
+    #[resource] map: &Map,
     commands: &mut CommandBuffer,
 ) {
     let mut players = <(Entity, &Point)>::query().filter(component::<Player>());
@@ -49,6 +50,20 @@ pub fn player_input(
             VirtualKeyCode::Key7 => use_item(6, ecs, commands),
             VirtualKeyCode::Key8 => use_item(7, ecs, commands),
             VirtualKeyCode::Key9 => use_item(8, ecs, commands),
+            VirtualKeyCode::Return => {
+                let (_, player_pos) = players
+                    .iter(ecs)
+                    .find_map(|(entity, pos)| Some((*entity, *pos)))
+                    .unwrap();
+
+                let player_idx = map_idx(player_pos.x, player_pos.y);
+                if map.tiles[player_idx] == TileType::Exit {
+                    *turn_state = TurnState::NextLevel;
+                    Point::zero()
+                } else {
+                    Point::zero()
+                }
+            }
             _ => Point::zero(),
         };
         players.iter(ecs).for_each(|(player_entity, pos)| {
