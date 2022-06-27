@@ -4,6 +4,7 @@ use crate::prelude::*;
 #[read_component(Point)]
 #[read_component(Name)]
 #[read_component(Health)]
+#[read_component(FieldOfView)]
 pub fn tooltips(ecs: &SubWorld, #[resource] mouse_pos: &Point, #[resource] camera: &Camera) {
     let mut enemies = <(Entity, &Point, &Name)>::query();
     let offset = camera.offset();
@@ -11,9 +12,15 @@ pub fn tooltips(ecs: &SubWorld, #[resource] mouse_pos: &Point, #[resource] camer
     let mut draw_batch = DrawBatch::new();
     draw_batch.target(HUD_CONSOLE);
 
+    let player_fov = <&FieldOfView>::query()
+        .filter(component::<Player>())
+        .iter(ecs)
+        .next()
+        .unwrap();
+
     enemies
         .iter(ecs)
-        .filter(|(_, pos, _)| **pos == map_pos)
+        .filter(|(_, pos, _)| **pos == map_pos && player_fov.visible_tiles.contains(&map_pos))
         .for_each(|(entity, _, name)| {
             let mut screen_pos = *mouse_pos * 2;
             let display =

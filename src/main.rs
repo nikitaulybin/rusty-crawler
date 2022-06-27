@@ -14,8 +14,8 @@ mod prelude {
     pub use legion::*;
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
-    pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH;
-    pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT;
+    pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 3;
+    pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 3;
     pub const MAP_CONSOLE: usize = 0;
     pub const PLAYER_CONSOLE: usize = 1;
     pub const HUD_CONSOLE: usize = 2;
