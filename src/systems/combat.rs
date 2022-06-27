@@ -4,6 +4,8 @@ use crate::prelude::*;
 #[read_component(WantsToAttack)]
 #[read_component(Player)]
 #[read_component(Damage)]
+#[read_component(Weapon)]
+#[read_component(Carried)]
 #[write_component(Health)]
 pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
     let mut attackers = <(Entity, &WantsToAttack)>::query();
@@ -25,12 +27,20 @@ pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
             .get_component::<Damage>()
             .unwrap()
             .0;
+
+        let weapon_damage: i32 = <(&Weapon, &Carried, &Damage)>::query()
+            .iter(ecs)
+            .filter(|(_, carried, _)| carried.0 == *attacker)
+            .map(|(_, _, damage)| damage.0)
+            .sum();
+
+        let total_damage = base_damage + weapon_damage;
         if let Ok(mut health) = ecs
             .entry_mut(*victim)
             .unwrap()
             .get_component_mut::<Health>()
         {
-            health.current -= base_damage;
+            health.current -= total_damage;
             if health.current < 1 && !is_player {
                 commands.remove(*victim);
             }

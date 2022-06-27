@@ -20,6 +20,7 @@ pub struct Template {
 pub enum EntityType {
     Enemy,
     Item,
+    Weapon,
 }
 #[derive(Clone, Deserialize, Debug)]
 pub struct Templates {
@@ -86,6 +87,11 @@ impl Templates {
                 );
                 commands.add_component(entity, ChasingPlayer);
                 commands.add_component(entity, FieldOfView::new(6));
+                commands.add_component(entity, Damage(template.base_damage.unwrap()));
+            }
+            EntityType::Weapon => {
+                commands.add_component(entity, Item {});
+                commands.add_component(entity, Weapon {});
                 commands.add_component(entity, Damage(template.base_damage.unwrap()));
             }
         }

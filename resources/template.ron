@@ -46,5 +46,23 @@ Templates(
             frequency: 2,
             base_damage: Some(3)
         ),
+        Template (
+            entity_type: Weapon,
+            name: "Rusty Sword", glyph: 's', levels: [0, 1, 2],
+            frequency: 3,
+            base_damage: Some(1),
+        ),
+        Template (
+            entity_type: Weapon,
+            name: "Great Sword", glyph: 'S', levels: [1, 2],
+            frequency: 2,
+            base_damage: Some(2),
+        ),
+        Template (
+            entity_type: Weapon,
+            name: "Legendary Sword", glyph: '/', levels: [2],
+            frequency: 2,
+            base_damage: Some(3),
+        ),
     ]
 )

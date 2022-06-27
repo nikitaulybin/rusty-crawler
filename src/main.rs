@@ -70,9 +70,11 @@ impl State {
         self.ecs = World::default();
         self.resources = Resources::default();
         let mut rng = RandomNumberGenerator::new();
-        let map_builder = MapBuilder::new(&mut rng, 0);
+        let mut map_builder = MapBuilder::new(&mut rng, 0);
         let player_start = map_builder.player_start;
         spawn_player(&mut self.ecs, player_start);
+        let exit_idx = map_builder.map.point2d_to_index(map_builder.amulet_start);
+        map_builder.map.tiles[exit_idx] = TileType::Exit;
         spawn_level(&mut self.ecs, &mut rng, 0, &map_builder.entity_spawns);
 
         self.resources.insert(map_builder.map);

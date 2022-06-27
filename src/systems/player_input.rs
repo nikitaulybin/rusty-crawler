@@ -8,6 +8,7 @@ use std::borrow::Borrow;
 #[read_component(Item)]
 #[read_component(Carried)]
 #[read_component(Name)]
+#[read_component(Weapon)]
 #[read_component(ProvidesHealing)]
 #[read_component(RevealsMap)]
 pub fn player_input(
@@ -31,6 +32,11 @@ pub fn player_input(
                     .find_map(|(entity, pos)| Some((*entity, *pos)))
                     .unwrap();
 
+                let carried_weapons: Vec<Entity> = <(Entity, &Weapon, &Carried)>::query()
+                    .iter(ecs)
+                    .filter(|(_, _, carried)| carried.0 == player_entity)
+                    .map(|(weapon_entity, _, _)| *weapon_entity)
+                    .collect();
                 let mut pickable_items = <(Entity, &Point, &Item)>::query();
                 pickable_items
                     .iter(ecs)
@@ -38,6 +44,16 @@ pub fn player_input(
                     .for_each(|(item_entity, _, _)| {
                         commands.remove_component::<Point>(*item_entity);
                         commands.add_component(*item_entity, Carried(player_entity));
+                        if let Ok(_is_weapon) = ecs
+                            .entry_ref(*item_entity)
+                            .unwrap()
+                            .get_component::<Weapon>()
+                        {
+                            carried_weapons.iter().for_each(|weapon| {
+                                commands.remove_component::<Carried>(*weapon);
+                                commands.add_component(*weapon, player_pos);
+                            });
+                        }
                     });
                 Point::zero()
             }
@@ -116,10 +132,13 @@ fn use_item(index: usize, ecs: &mut SubWorld, commands: &mut CommandBuffer) -> P
     if let Some((_name, items)) = item_map.get_index(index) {
         let mut items_copy = items.clone();
         let item = items_copy.pop().unwrap();
-        commands.push((ActivateItem {
-            item,
-            applied_by: *player_entity,
-        },));
+
+        if let Err(_consumable) = ecs.entry_ref(item).unwrap().get_component::<Weapon>() {
+            commands.push((ActivateItem {
+                item,
+                applied_by: *player_entity,
+            },));
+        }
     }
     Point::zero()
 }
