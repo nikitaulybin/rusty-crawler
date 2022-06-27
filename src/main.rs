@@ -49,10 +49,8 @@ impl State {
         spawn_player(&mut ecs, player_start);
         let exit_idx = map_builder.map.point2d_to_index(map_builder.amulet_start);
         map_builder.map.tiles[exit_idx] = TileType::Exit;
-        map_builder
-            .entity_spawns
-            .iter()
-            .for_each(|pos| spawn_entity(&mut ecs, &mut rng, *pos));
+
+        spawn_level(&mut ecs, &mut rng, 0, &map_builder.entity_spawns);
 
         resources.insert(map_builder.map);
         resources.insert(Camera::new(player_start));
@@ -75,10 +73,7 @@ impl State {
         let map_builder = MapBuilder::new(&mut rng, 0);
         let player_start = map_builder.player_start;
         spawn_player(&mut self.ecs, player_start);
-        map_builder
-            .entity_spawns
-            .iter()
-            .for_each(|pos| spawn_entity(&mut self.ecs, &mut rng, *pos));
+        spawn_level(&mut self.ecs, &mut rng, 0, &map_builder.entity_spawns);
 
         self.resources.insert(map_builder.map);
         self.resources.insert(Camera::new(player_start));
@@ -140,10 +135,12 @@ impl State {
             map_builder.map.tiles[exit_idx] = TileType::Exit;
         }
 
-        map_builder
-            .entity_spawns
-            .iter()
-            .for_each(|pos| spawn_entity(&mut self.ecs, &mut rng, *pos));
+        spawn_level(
+            &mut self.ecs,
+            &mut rng,
+            map_level.try_into().unwrap(),
+            &map_builder.entity_spawns,
+        );
 
         self.resources.insert(map_builder.map);
         self.resources.insert(Camera::new(map_builder.player_start));

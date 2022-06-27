@@ -51,9 +51,6 @@ impl MapBuilder {
         apply_prefab(&mut mb, rng);
         apply_prefab(&mut mb, rng);
 
-        let amulet_start_idx = map_idx(mb.amulet_start.x, mb.amulet_start.y);
-        mb.map.tiles[amulet_start_idx] = TileType::Exit;
-
         mb.theme = match map_level {
             0 => ForestTheme::build(),
             _ => DungeonTheme::build(),

@@ -76,3 +76,5 @@ pub struct ActivateItem {
     pub item: Entity,
     pub applied_by: Entity,
 }
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Damage(pub i32);
